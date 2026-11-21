@@ -9,17 +9,19 @@ server, and a requirements-first workflow with reusable document templates.
 - **`opencode.jsonc`** — project config with the Context7 MCP server and a light override
   of the built-in `plan` agent so it can author documents but not code.
 - **`AGENTS.md`** — persistent rules: workflow gates, artifact naming, definition of done.
-- **`.opencode/agents/verifier.md`** — the only custom agent: a read-only-to-code subagent
-  that reviews, runs checks and validates acceptance criteria.
-- **`.opencode/commands/`** — `/spec`, `/plan`, `/review`, `/implement`.
+- **`.opencode/agents/spec-reviewer.md`** — custom subagent for the pre-implementation
+  gate: reviews requirement and plan quality, coverage and testability.
+- **`.opencode/agents/verifier.md`** — custom subagent for the post-implementation gate:
+  a read-only-to-code subagent that reviews the diff, runs checks and validates
+  acceptance criteria.
+- **`.opencode/commands/`** — `/spec`, `/plan`, `/spec-review`, `/review`, `/implement`.
 - **`.opencode/skills/`** — local skills for EARS+BDD authoring, planning, and Context7 docs.
 - **`.agents/skills/` + `skills-lock.json`** — skills installed from
   [skills.sh](https://skills.sh/), committed for reproducibility.
-- **`docs/`** — templates for requirements, plans, decisions and verification reports.
-  Concrete examples belong in a separate example repository.
+- **`docs/`** — templates and two complete worked examples (R001/R002).
 
 OpenCode reuses its built-in `plan`, `build`, `explore` and `general` agents for everything
-else, so the kit adds only one agent.
+else, so the kit adds only two agents: `spec-reviewer` and `verifier`
 
 ## Quick start
 
@@ -47,7 +49,7 @@ Config and command changes reload automatically. Use `/reload` to force a full r
 ## Workflow
 
 ```
-/spec  →  /plan  →  /review  →  /implement  →  /review  →  done
+/spec  →  /plan  →  /spec-review  →  /implement  →  /review  →  done
 ```
 
 1. **`/spec "<feature>"`** — the `plan` agent uses `grill-me` to clarify the feature with
@@ -59,8 +61,9 @@ Config and command changes reload automatically. Use `/reload` to force a full r
 3. **`/plan R###`** — writes `docs/plans/P###-<slug>.md`: approach, alternatives, file-level
    changes, test strategy, risks, task checklist and `REQ-###` traceability. An ADR is
    recorded in `docs/decisions/` only for consequential decisions.
-4. **`/review R### P###`** — the `verifier` subagent independently checks for gaps,
-   contradictions and untestable criteria. Iterate until clean.
+4. **`/spec-review R### P###`** — the `spec-reviewer` subagent independently checks the
+   documents for gaps, contradictions, coverage holes and untestable criteria. It writes
+   `docs/reviews/<requirement-id>-spec-review.md`. Iterate until clean.
 5. **`/implement P###`** — the `build` agent writes code and tests, uses Context7 for
    library APIs, and finishes by launching the `verifier` subagent.
 6. **Final `/review`** on the diff. Done when every Gherkin scenario passes and the
@@ -105,16 +108,25 @@ API, and record them in the plan.
 
 ## Verification
 
-The `verifier` subagent:
+There are two independent gates, served by two subagents:
+
+**Before implementation — `/spec-review` (the `spec-reviewer` subagent):**
+
+- checks EARS quality, `REQ-###` coverage by Gherkin scenarios, testability and scope;
+- checks the plan's traceability from every `REQ-###` to a change and a test;
+- writes `docs/reviews/<id>-spec-review.md` with a PASS/FAIL verdict;
+- stops if implementation already exists, deferring to `/review`.
+
+**After implementation — `/review` (the `verifier` subagent):**
 
 - reads the diff and reports static findings by severity with `file:line`;
 - discovers and runs the project's test/check commands from `AGENTS.md` or the manifest;
 - marks each Gherkin scenario pass/fail with evidence;
 - writes `docs/reviews/<id>-verification.md`;
-- never edits code.
+- never edits code; stops if there is no implementation yet, deferring to `/spec-review`.
 
-Since no stack is chosen yet, it reports "no automated checks configured" until test
-commands exist.
+Since no stack is chosen yet, the verifier reports "no automated checks configured" until
+test commands exist.
 
 ## Future extension: automatic verification on session idle
 
