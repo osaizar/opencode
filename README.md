@@ -2,7 +2,7 @@
 
 A reusable, stack-agnostic [OpenCode](https://opencode.ai/) configuration kit: base
 configuration, one custom subagent, slash commands, local and third-party skills, an MCP
-server, and a requirements-first workflow with worked examples.
+server, and a requirements-first workflow with reusable document templates.
 
 ## What's inside
 
@@ -15,7 +15,8 @@ server, and a requirements-first workflow with worked examples.
 - **`.opencode/skills/`** — local skills for EARS+BDD authoring, planning, and Context7 docs.
 - **`.agents/skills/` + `skills-lock.json`** — skills installed from
   [skills.sh](https://skills.sh/), committed for reproducibility.
-- **`docs/`** — templates and two complete worked examples (R001/R002).
+- **`docs/`** — templates for requirements, plans, decisions and verification reports.
+  Concrete examples belong in a separate example repository.
 
 OpenCode reuses its built-in `plan`, `build`, `explore` and `general` agents for everything
 else, so the kit adds only one agent.
@@ -99,8 +100,8 @@ OAuth (no API key in config). It exposes `context7_resolve-library-id` and
 Only Context7 is active; GitHub and Playwright are documented as disabled opt-ins to keep
 context usage low.
 
-The example features are deliberately library-free, so Context7 will not fire during
-them. Once a stack is chosen, library IDs must be resolved before finalising a plan.
+Resolve library IDs with Context7 before finalising any plan that depends on a third-party
+API, and record them in the plan.
 
 ## Verification
 
@@ -156,7 +157,7 @@ plugin is documented but intentionally not included in the initial kit.
 
 ## Customising for a new project
 
-- Replace the example `docs/` artifacts with your own `R###`/`P###` documents.
+- Add your own `R###`/`P###` documents using the templates in `docs/`.
 - Once a stack is chosen, add `formatter`, `lsp` and test commands to `AGENTS.md` and
   `opencode.jsonc`, then extend the verifier prompt with the exact check commands.
 - Keep `default_agent: "build"`; override individual built-ins rather than replacing them.
