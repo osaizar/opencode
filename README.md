@@ -173,3 +173,17 @@ plugin is documented but intentionally not included in the initial kit.
 - Once a stack is chosen, add `formatter`, `lsp` and test commands to `AGENTS.md` and
   `opencode.jsonc`, then extend the verifier prompt with the exact check commands.
 - Keep `default_agent: "build"`; override individual built-ins rather than replacing them.
+
+---
+
+<div align="center">
+
+<a href="https://0rwx.com">
+  <img src="https://raw.githubusercontent.com/NamtaoProductions/0rwx.com/main/static/AI-W-light.svg#gh-light-mode-only" alt="AI:W WRITE" width="80" />
+  <img src="https://raw.githubusercontent.com/NamtaoProductions/0rwx.com/main/static/AI-W-dark.svg#gh-dark-mode-only" alt="AI:W WRITE" width="80" />
+</a>
+
+**This repository follows [W (WRITE)](https://0rwx.com) in the [0rwx framework](https://0rwx.com)** —
+AI has read-write permissions (AI collaboration): I read the code, "I fix".
+
+</div>
